@@ -22,29 +22,39 @@ function miScrapper(nombre) {
         const url = 'https://www.eneba.com';
         const link = url + "/store/all?text=/" + query + "&enbCampaign=Main%20Search&enbContent=search%20dropdown%20-%20categories&enbMedium=link&enbTerm=";
         const products = [];
-        const $ = yield (0, request_promise_1.default)({
-            uri: link,
-            transform: body => cheerio_1.default.load(body)
-        });
-        $('.uy1qit').each((i, el) => {
-            const nombre = $(el).find('.YLosEL').text();
-            const precioString = $(el).find('.L5ErLT').text().replace('€', '');
-            const precio = parseFloat(precioString);
-            const image = $(el).find('img').attr('src');
-            const link = url + $(el).find('.b3POZC .oSVLlh').attr('href');
-            const page = "eneba";
-            if (precio) {
-                if (image != undefined) {
-                    products.push({
-                        nombre,
-                        precio,
-                        image,
-                        link,
-                        page
-                    });
+        try {
+            const $ = yield (0, request_promise_1.default)({
+                uri: link,
+                transform: body => cheerio_1.default.load(body)
+            });
+            let contador = 0;
+            $('.uy1qit').each((i, el) => {
+                if (contador >= 7) {
+                    return false; // Detiene el bucle
                 }
-            }
-        });
+                const nombre = $(el).find('.YLosEL').text();
+                const precioString = $(el).find('.L5ErLT').text().replace('€', '');
+                const precio = parseFloat(precioString);
+                const image = $(el).find('img').attr('src');
+                const link = url + $(el).find('.b3POZC .oSVLlh').attr('href');
+                const page = "eneba";
+                if (precio) {
+                    if (image != undefined) {
+                        products.push({
+                            nombre,
+                            precio,
+                            image,
+                            link,
+                            page
+                        });
+                    }
+                }
+                contador++;
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
         return products;
     });
 }

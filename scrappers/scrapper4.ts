@@ -7,12 +7,18 @@ async function miScrapper4(name: string): Promise<any[]> {
   const link = url + query;
   const products: any[] = [];
 
+  try{
+
+  
   const $ = await request({
     uri: link,
     transform: body => cheerio.load(body)
   });
-
+  let contador = 0
   $('#search_result_container a').each((i: any, el: any) => {
+    if (contador >= 7) {
+      return false; // Detiene el bucle
+    }
     const nombre = $(el).find('.search_name span').text();
     const precioSinFormato = $(el).find('.search_price').text(); // '\n $69.99 '
     const precioLimpio = precioSinFormato.trim().replace(/\$/g, ''); // '69.99'
@@ -38,7 +44,11 @@ async function miScrapper4(name: string): Promise<any[]> {
         }
       }
     }
+    contador++;
   });
+}catch (error) {
+  console.log(error);
+}
 
   return products;
 }

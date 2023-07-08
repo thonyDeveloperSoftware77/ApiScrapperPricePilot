@@ -4,6 +4,7 @@ const express_1 = require("express");
 const favorito_1 = require("../controllers/favorito");
 const router = (0, express_1.Router)();
 router.get('/:idUsuario', favorito_1.getfavoritos);
+router.get('/juego/:idJuego', favorito_1.getfavoritosJuego);
 router.post('/', favorito_1.postfavorito);
 router.put('/:id', favorito_1.putfavorito);
 router.delete('/:id', favorito_1.deletefavorito);

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletefavorito = exports.putfavorito = exports.postfavorito = exports.getfavoritos = void 0;
+exports.deletefavorito = exports.putfavorito = exports.postfavorito = exports.getfavoritosJuego = exports.getfavoritos = void 0;
 const favoritos_1 = __importDefault(require("../models/favoritos"));
 const juego_1 = __importDefault(require("../models/juego"));
 const getfavoritos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -22,7 +22,7 @@ const getfavoritos = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             idUsuario,
         },
         attributes: {
-            exclude: ['idUsuario', 'idJuego', 'id']
+            exclude: ['idUsuario', 'idJuego']
         },
         include: [{
                 model: juego_1.default,
@@ -39,9 +39,44 @@ const getfavoritos = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getfavoritos = getfavoritos;
+const getfavoritosJuego = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { idJuego } = req.params;
+    const favoritos = yield favoritos_1.default.findAll({
+        where: {
+            idJuego,
+        },
+        attributes: {
+            exclude: ['idUsuario', 'idJuego', 'id']
+        },
+        include: [{
+                model: juego_1.default,
+                as: 'Juego'
+            }]
+    });
+    if (favoritos.length > 0) {
+        res.json({ favoritos });
+    }
+    else {
+        res.status(404).json({
+            msg: `No existen favoritos para el juego con el id ${idJuego}`
+        });
+    }
+});
+exports.getfavoritosJuego = getfavoritosJuego;
 const postfavorito = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
     try {
+        const existeFavorito = yield favoritos_1.default.findOne({
+            where: {
+                idUsuario: body.idUsuario,
+                idJuego: body.idJuego,
+            },
+        });
+        if (existeFavorito) {
+            return res.status(400).json({
+                msg: `Ya existe un juego en favoritos con id ${body.idJuego} para el usuario con id ${body.idUsuario}`,
+            });
+        }
         const favorito = yield favoritos_1.default.build(body);
         yield favorito.save();
         res.json(favorito);
@@ -76,11 +111,11 @@ const putfavorito = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.putfavorito = putfavorito;
 const deletefavorito = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { idJuego } = req.params;
-    const favorito = yield favoritos_1.default.findByPk(idJuego);
+    const { id } = req.params;
+    const favorito = yield favoritos_1.default.findByPk(id);
     if (!favorito) {
         return res.status(404).json({
-            msg: 'No existe un favorito con el id ' + idJuego
+            msg: 'No existe un favorito con el id ' + id
         });
     }
     yield favorito.destroy();

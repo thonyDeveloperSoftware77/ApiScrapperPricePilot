@@ -22,28 +22,38 @@ function miScrapper3(nombre) {
         const url = 'https://www.gamersgate.com';
         const link = url + '/es/games/?query=' + query;
         const products = [];
-        const $ = yield (0, request_promise_1.default)({
-            uri: link,
-            transform: body => cheerio_1.default.load(body)
-        });
-        $('.product--item').each((i, el) => {
-            const nombre = $(el).attr('data-name');
-            const precio = $(el).attr('data-price');
-            const image = $(el).find('img').attr('src');
-            const link = url + $(el).find('a').attr('href');
-            const page = "gamersgate";
-            if (precio) {
-                if (image != undefined) {
-                    products.push({
-                        nombre,
-                        precio,
-                        image,
-                        link,
-                        page
-                    });
+        try {
+            const $ = yield (0, request_promise_1.default)({
+                uri: link,
+                transform: body => cheerio_1.default.load(body)
+            });
+            let contador = 0;
+            $('.product--item').each((i, el) => {
+                if (contador >= 7) {
+                    return false; // Detiene el bucle
                 }
-            }
-        });
+                const nombre = $(el).attr('data-name');
+                const precio = $(el).attr('data-price');
+                const image = $(el).find('img').attr('src');
+                const link = url + $(el).find('a').attr('href');
+                const page = "gamersgate";
+                if (precio) {
+                    if (image != undefined) {
+                        products.push({
+                            nombre,
+                            precio,
+                            image,
+                            link,
+                            page
+                        });
+                    }
+                }
+                contador++;
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
         return products;
     });
 }
