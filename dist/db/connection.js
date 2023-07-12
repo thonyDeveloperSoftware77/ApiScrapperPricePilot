@@ -8,7 +8,7 @@ const sequelize_1 = require("sequelize");
 //Configuración de las variables de entorno
 dotenv_1.default.config();
 const db = new sequelize_1.Sequelize('Scrapper', process.env.USER_DATABASE || '', process.env.PASSWORD_DATABASE || '', {
-    host: 'localhost',
+    host: 'scrapper.database.windows.net',
     dialect: 'mssql',
 });
 exports.default = db;

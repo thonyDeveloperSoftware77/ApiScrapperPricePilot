@@ -5,7 +5,7 @@ import { Sequelize } from "sequelize";
 dotenv.config();
 
 const db = new Sequelize('Scrapper', process.env.USER_DATABASE ||'', process.env.PASSWORD_DATABASE || '',{
-    host: 'localhost',
+    host: 'scrapper.database.windows.net',
     dialect: 'mssql',
     
 });
